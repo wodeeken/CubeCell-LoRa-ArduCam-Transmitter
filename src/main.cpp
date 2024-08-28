@@ -1,3 +1,6 @@
+#include <ArduCAM.h>
+#include <SPI.h>
+#include <Wire.h>
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 #include "Constants.cpp"
@@ -46,6 +49,13 @@ Constants::TransmitterState CurrentTransmitterState = Constants::Wait;
 
 // MOCK Camera data.
 char* MockCameraData = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200";
+// ArduCAM definitions and declarations.
+int CS = GPIO1;
+ArduCAM myCAM ;//;
+bool is_header = false;
+int mode = 0;
+uint8_t read_fifo_burst(ArduCAM myCAM);
+
 void setup() {
     // Setup serial.
     Serial.begin(38400);
@@ -65,6 +75,69 @@ void setup() {
                                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
                                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
                                    true, 0, 0, LORA_IQ_INVERSION_ON, 3000 ); 
+
+    // ArduCAM Setup code.
+    uint8_t vid, pid;
+    uint8_t temp;
+    // put your setup code here, to run once:
+    delay(3000);
+    Wire.begin();
+    pinMode(CS, OUTPUT);
+    myCAM = ArduCAM(OV2640, CS);
+    pinMode(CS, OUTPUT);
+    digitalWrite(CS, HIGH);
+    // initialize SPI:
+    SPI.begin(SCK,MISO,MOSI,GPIO1);// sck, miso, mosi, nss
+
+    //update frequency to 10000000;
+    SPI.setFrequency(1000000);
+    //Reset the CPLD
+    myCAM.write_reg(0x07, 0x80);
+    delay(100);
+    myCAM.write_reg(0x07, 0x00);
+    delay(100);
+    while(1){
+      //Check if the ArduCAM SPI bus is OK
+      myCAM.write_reg(ARDUCHIP_TEST1, 0x55);
+      temp = myCAM.read_reg(ARDUCHIP_TEST1);
+
+      if (temp != 0x55){
+        Serial.println(temp);
+        Serial.println(F("ACK CMD SPI interface Error! END"));
+        delay(1000);
+        continue;
+      }else{
+        Serial.println(F("ACK CMD SPI interface OK. END"));
+        break;
+      }
+    }
+
+    while(1){
+      //Check if the camera module type is OV2640
+      myCAM.wrSensorReg8_8(0xff, 0x01);
+      myCAM.rdSensorReg8_8(OV2640_CHIPID_HIGH, &vid);
+      myCAM.rdSensorReg8_8(OV2640_CHIPID_LOW, &pid);
+      delay(2000);
+      if ((vid != 0x26 ) && (( pid != 0x41 ) || ( pid != 0x42 ))){
+        Serial.println(F("ACK CMD Can't find OV2640 module! END"));
+        delay(1000);
+        continue;
+      }
+      else{
+        Serial.println(F("ACK CMD OV2640 detected. END"));
+        break;
+      } 
+    }
+    myCAM.set_format(JPEG);
+    myCAM.InitCAM();
+    //myCAM.OV2640_set_JPEG_size(OV2640_1600x1200);
+    myCAM.OV2640_set_JPEG_size(OV2640_176x144);
+    //myCAM.OV2640_set_JPEG_size(OV2640_352x288);
+    //myCAM.OV2640_set_JPEG_size(OV2640_1600x1200);
+    //myCAM.OV2640_set_Special_effects(BW);
+    delay(1000);
+    myCAM.clear_fifo_flag();
+    Serial.println("Done setting up Cam.");
 }
 
 
@@ -146,12 +219,25 @@ void loop()
       
       break;
       case Constants::CameraCaptureRequest:
-        // TO DO: implement camera logic. Use mock data for now.
+        myCAM.flush_fifo();
+        myCAM.clear_fifo_flag();
+        //Start capture
+        delay(250);
+        myCAM.start_capture();
+        delay(250);
         CurrentTransmitterState = Constants::CameraCaptureWait;
       break;
       case Constants::CameraCaptureWait:
       // Do nothing while camera works. 
-        CurrentTransmitterState = Constants::CameraCaptureComplete;
+      if (myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
+        {
+          delay(50);
+          read_fifo_burst(myCAM);
+          //Clear the capture done flag
+          myCAM.clear_fifo_flag();
+          CurrentTransmitterState = Constants::CameraCaptureComplete;
+        }
+        
       break;
       case Constants::CameraCaptureComplete:
         // Send back response with num of packets.
@@ -228,4 +314,56 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
     Radio.Sleep( );
     Serial.println("Timedout");
     lora_idle = true;
+  }
+
+  // ArduCAM Functions.
+  uint8_t read_fifo_burst(ArduCAM myCAM)
+  {
+    uint8_t temp = 0, temp_last = 0;
+    uint32_t length = 0;
+    length = myCAM.read_fifo_length();
+    if (length >= MAX_FIFO_SIZE) //512 kb
+    {
+      Serial.println(F("ACK CMD Over size. END"));
+      return 0;
+    }
+    if (length == 0 ) //0 kb
+    {
+      Serial.println(F("ACK CMD Size is 0. END"));
+      return 0;
+    }
+    myCAM.CS_LOW();
+    myCAM.set_fifo_burst();//Set fifo burst mode
+    temp =  SPI.transfer(0x00);
+    length --;
+    while ( length-- )
+    {
+      temp_last = temp;
+      temp =  SPI.transfer(0x00);
+      if (is_header == true)
+      {
+        Serial.write(temp);
+      
+      }
+      else if ((temp == 0xD8) & (temp_last == 0xFF))
+      {
+        is_header = true;
+        Serial.write(temp_last);
+        
+
+        Serial.write(temp);
+      
+    
+      }
+      if ( (temp == 0xD9) && (temp_last == 0xFF) ) //If find the end ,break while,
+      break;
+      delayMicroseconds(15);
+    }
+    myCAM.CS_HIGH();
+    is_header = false;
+    return 1;
+  }
+
+  void TriggerCamera(){
+
   }
