@@ -48,12 +48,15 @@ void OnRxTimeout();
 Constants::TransmitterState CurrentTransmitterState = Constants::Wait;
 
 // MOCK Camera data.
-char* MockCameraData = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200";
+//char* MockCameraData = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200";
 // ArduCAM definitions and declarations.
 int CS = GPIO1;
 ArduCAM myCAM ;//;
 bool is_header = false;
 int mode = 0;
+char CameraData[4000];
+//char MockCameraData[3844] = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ11121314151617189101a1b1c1d1e1f1g1h1i1j1k1l1m1n1o1p1q1r1s1t1u1v1w1x1y1z1A1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1X1Y1Z212223242526272829202a22b2c2d2e2f2g2h2i2j2k2l2m2n2o2p2q2r2s2t2u2v2w2x2y2z2A2B2C2D2E2F2G2H2I2J2K2L2M2N2O2P2Q2R2S2T2U2V2W2X2Y2Z313233343536373839303a3b3c3d3e3f3g3h3i3j3k3l3m3n3o3p3q3r3s3t3u3v3w3x3y3z3A3B3C3D3E3F3G3H3I3J3K3L3M3N3O3P3Q3R3S3T3U3V3W3X3Y3Z414243444546474849404a4b4c4d4e4f4g4h4i4j4k45l4m4n4o4p4q4r4s4t4u4v4w4x4y4z4A4B4C4D4E4F4G4H4I4J4K4L4M4N4O4P4Q4R4S4T4U4V4W4X4Y4Z";//[6000];
+int imageLength; // = sizeof(CameraData);
 uint8_t read_fifo_burst(ArduCAM myCAM);
 
 void setup() {
@@ -219,6 +222,8 @@ void loop()
       
       break;
       case Constants::CameraCaptureRequest:
+        //CurrentTransmitterState = Constants::CameraCaptureWait;
+        //break;
         myCAM.flush_fifo();
         myCAM.clear_fifo_flag();
         //Start capture
@@ -228,6 +233,8 @@ void loop()
         CurrentTransmitterState = Constants::CameraCaptureWait;
       break;
       case Constants::CameraCaptureWait:
+      //CurrentTransmitterState = Constants::CameraCaptureComplete;
+      //break;
       // Do nothing while camera works. 
       if (myCAM.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK))
         {
@@ -244,16 +251,19 @@ void loop()
         Serial.println("We inside the camera capture complete case..");
         // Send data back, and go back to waiting.
         if(lora_idle){
-        
+          //Serial.println("Data1");
+          //Serial.println(CameraData);
           lora_idle = false;
           String response = String(Constants::ToRec_Camera_Image_Request_Response);
-          response.replace("PACKETS", String((strlen(MockCameraData) / Constants::PacketSize) + 1));
+          response.replace("PACKETS", String((imageLength / Constants::PacketSize) + 1));
+          //Serial.println("data2");
           sprintf(txpacket, response.c_str());
           Serial.print("About to send a packet!");
           Serial.println(txpacket);
           Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
           CurrentTransmitterState = Constants::Wait;
-        }else;
+        }else
+        Serial.println("Waiting");
           // Stay in state until lora isn't busy.
       break;
       case Constants::DataTransferPacketSend:
@@ -264,14 +274,67 @@ void loop()
           lora_idle = false;
           String response = String(Constants::ToRec_Data_Transfer_Response_Header);
           response.replace("PACKET_NUM", String(DataRequestPacket));
+          response.trim();
           char currentPacketData[Constants::PacketSize];
-          memcpy(currentPacketData, &MockCameraData[(DataRequestPacket * Constants::PacketSize)], Constants::PacketSize);
-          response += String(currentPacketData) + String(Constants::ToRec_Data_Transfer_Response_Footer);
+          Serial.print("Sending " );
+          Serial.print((DataRequestPacket * Constants::PacketSize));
+          Serial.print(" through ");
+          Serial.println((DataRequestPacket * Constants::PacketSize) + Constants::PacketSize);
+          int curPacketIndex = 0;
+          for(int i = DataRequestPacket * Constants::PacketSize; i < (DataRequestPacket * Constants::PacketSize) + Constants::PacketSize; i++){
+            currentPacketData[curPacketIndex] = CameraData[i];
+            curPacketIndex++;
+          }
+          //memcpy(currentPacketData, &CameraData[(DataRequestPacket * Constants::PacketSize)], Constants::PacketSize);
+          Serial.print("Size of packet w/ header: ");
+          Serial.println(sizeof(currentPacketData));
+          // Serial.println("<BEGIN>");
+          // Serial.println(currentPacketData);
+          // Serial.println("<END>");
+          //response += String(currentPacketData) + String(Constants::ToRec_Data_Transfer_Response_Footer);
           
-          sprintf(txpacket, response.c_str());
-          Serial.print("About to send a packet!");
-          Serial.println(txpacket);
-          Radio.Send( (uint8_t *)txpacket, strlen(txpacket) );
+          memset(txpacket, 0, 128);
+          //char headerChars[response.length()];
+          //response.toCharArray(headerChars, response.length());
+          response.toCharArray(txpacket, response.length() + 1);
+          //strcat(txpacket, headerChars);
+          // Serial.println("currentPack1:");
+          // Serial.println(txpacket);
+          // Serial.println("End");
+          int y = strlen(txpacket);
+          Serial.print("Begin index for txpacket: ");
+          Serial.println(y);
+          for(int i = 0; i < sizeof(currentPacketData); i++){
+            txpacket[y] = currentPacketData[i];
+            y++;
+          }
+          Serial.println("Current Data Packet DATA: ");
+          for(int i = 0; i < sizeof(currentPacketData); i++){
+            Serial.print("0x");
+            Serial.print(currentPacketData[i], HEX);
+            Serial.print(",");
+          }
+          
+          //strcat(txpacket, currentPacketData);
+
+          // Serial.println("currentPack2:");
+          // Serial.println(txpacket);
+          // Serial.println("End");
+          //strcat(txpacket, Constants::ToRec_Data_Transfer_Response_Footer);
+          // Serial.println("currentPack3:");
+          // Serial.println(txpacket);
+          // Serial.println("End");
+          // Serial.print("About to send a packet!");
+          // Serial.println(txpacket);
+          // Print off Camera Data, 
+          Serial.println("Camera Data Packet: " + String(DataRequestPacket));
+          for(int i = 0; i < sizeof(txpacket); i++){
+            Serial.print(txpacket[i], HEX);
+            Serial.print(",");
+          }
+          Serial.println("<DONE> Size of packet: ");
+          Serial.println(sizeof(txpacket));
+          Radio.Send( (uint8_t *)txpacket, sizeof(txpacket) );
           CurrentTransmitterState = Constants::Wait;
         }else;
           // Stay in state until lora isn't busy.
@@ -321,37 +384,61 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
   {
     uint8_t temp = 0, temp_last = 0;
     uint32_t length = 0;
+    Serial.println("Assiging camdata = {asdf");
+    
     length = myCAM.read_fifo_length();
+    Serial.print("Length of image ");
+    Serial.println(length);
     if (length >= MAX_FIFO_SIZE) //512 kb
     {
-      Serial.println(F("ACK CMD Over size. END"));
+      //Serial.println(F("ACK CMD Over size. END"));
+      Serial.println("Assigning camdata = {}");
+      //tempCameraData = "";
       return 0;
     }
     if (length == 0 ) //0 kb
     {
-      Serial.println(F("ACK CMD Size is 0. END"));
+      //Serial.println(F("ACK CMD Size is 0. END"));
+      Serial.println("Assigning camdata = 0");
+      //tempCameraData = "0";
       return 0;
     }
     myCAM.CS_LOW();
     myCAM.set_fifo_burst();//Set fifo burst mode
     temp =  SPI.transfer(0x00);
     length --;
+    int index = 0;
     while ( length-- )
     {
       temp_last = temp;
       temp =  SPI.transfer(0x00);
       if (is_header == true)
       {
-        Serial.write(temp);
+        //Serial.println("Assigning cat 1");
+        // Serial.print("0x");
+        // Serial.print(temp, HEX);
+        // Serial.print(",");
+        CameraData[index] = temp;
+        index++;
+        //Serial.write(temp);
       
       }
       else if ((temp == 0xD8) & (temp_last == 0xFF))
       {
         is_header = true;
-        Serial.write(temp_last);
+        //Serial.println("Assigning cat 2");
+        // Serial.print("0x");
+        // Serial.print(temp_last, HEX);
+        // Serial.print(",");
+        CameraData[index] = temp_last;
+        index++;
+        //Serial.write(temp_last);
         
-
-        Serial.write(temp);
+        // Serial.print("0x");
+        // Serial.println(temp, HEX);
+        // Serial.println(",");
+        CameraData[index] = temp;
+        index++;
       
     
       }
@@ -361,6 +448,21 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
     }
     myCAM.CS_HIGH();
     is_header = false;
+    //CameraData = tempCameraData;
+    Serial.print("Index: ");
+    Serial.println(index);
+    imageLength = index;
+    for(int i = 0; i < imageLength; i++){
+      Serial.print("0x");
+      Serial.print(CameraData[i], HEX);
+      Serial.print(",");
+    }
+    //Serial.println("Print out camdata.");
+    //Serial.println(tempCameraData);
+    //Serial.print("Size of tempCameraData: ") ;
+    //Serial.println(sizeof(tempCameraData));
+    //Serial.print("Size of camdata: ");
+    //Serial.println(sizeof(CameraData));
     return 1;
   }
 
