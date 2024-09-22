@@ -10,6 +10,7 @@ A VSCode/Platform IO project for the HelTec CubeCell HTCC-AB01 LoRa board wired 
 
 1. This program was created using the PlatformIO extension for VSCode.
 2. The ArduCAM is wired to the HTCC-AB01 board in the following table:
+
 | ArduCAM | HTCC-AB01 Pins (Printed Labels) |
 |---------|---------------------------------|
 | CS      | 1                               |
