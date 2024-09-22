@@ -8,7 +8,7 @@ struct Constants{
     static constexpr char* ToRec_Data_Transfer_Response_Header = "<DATA_TRANSFER_RESPONSE {PACKET_NUM}>";
     //static constexpr char* ToRec_Data_Transfer_Response_Footer = "</DATA_TRANSFER_RESPONSE>";
     static constexpr char* ToRec_Camera_Malfunction = "<CAMERA_ERROR>";
-    static const int RecTimeout = 3000;
+    static const int RecTimeout = 1000;
     static const int PacketSize = 95;
     // Time to wait for confirmation to begin data transfer, or the time between a packet send and t
     //the request to send the next one.
