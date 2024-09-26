@@ -279,20 +279,12 @@ void loop()
           response.toCharArray(txpacket, response.length() + 1);
           
           int y = strlen(txpacket);
-          Serial.print("Begin index for txpacket: ");
-          Serial.println(y);
+          
           for(int i = 0; i < sizeof(currentPacketData); i++){
             txpacket[y] = currentPacketData[i];
             y++;
           }
-          Serial.println("Current Data Packet DATA: ");
-          for(int i = 0; i < sizeof(currentPacketData); i++){
-            Serial.print("0x");
-            Serial.print(currentPacketData[i], HEX);
-            Serial.print(",");
-          }
-          Serial.println("<DONE> Size of packet: ");
-          Serial.println(sizeof(txpacket));
+          
           Radio.Send( (uint8_t *)txpacket, sizeof(txpacket) );
           CurrentTransmitterState = Constants::Wait;
         }else;
@@ -310,7 +302,6 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
       memcpy(rxpacket, payload, size );
       rxpacket[size]='\0';
       turnOnRGB(COLOR_RECEIVED,0);
-      Radio.Sleep( );
       Serial.printf("\r\nreceived packet \"%s\" with rssi %d , length %d\r\n",rxpacket,rssi,rxSize);
       lora_idle = true;
   }
@@ -323,14 +314,12 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
   void OnTxTimeout( void )
   {
     turnOffRGB();
-    Radio.Sleep( );
     lora_idle = true;
   }
   void OnRxTimeout( void )
   {
     RxTimedout = true;
     turnOffRGB();
-    Radio.Sleep( );
     Serial.println("Timedout");
     lora_idle = true;
   }
